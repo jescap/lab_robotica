@@ -2,8 +2,7 @@ FROM osrf/ros:noetic-desktop-full
 
 SHELL ["/bin/bash", "-c"] 
 
-
-# required ROS packages  
+# Required ROS packages  
 RUN sudo apt update && apt install -y ros-noetic-joy ros-noetic-teleop-twist-joy \
     ros-noetic-teleop-twist-keyboard ros-noetic-laser-proc \
     ros-noetic-rgbd-launch ros-noetic-rosserial-arduino \
@@ -18,16 +17,16 @@ RUN sudo apt update && apt install -y ros-noetic-joy ros-noetic-teleop-twist-joy
 RUN sudo apt install -y ros-noetic-dynamixel-sdk \
     ros-noetic-turtlebot3-*
 
-# we also install Git, just in case
+# We also install Git, just in case
 RUN sudo apt install -y git
 
 # MESA drivers for hardware acceleration graphics (Gazebo and RViz)
 RUN sudo apt -y install libgl1-mesa-glx libgl1-mesa-dri && \
     rm -rf /var/lib/apt/lists/*
 
-# we source the ROS instalation 
+# We source the ROS instalation 
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 RUN echo "export TURTLEBOT3_MODEL=burger" >> ~/.bashrc
 
-# the work directory inside our container
+# The working directory inside our container
 WORKDIR "/home/lab_robotica"
