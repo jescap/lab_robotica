@@ -29,4 +29,4 @@ RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 RUN echo "export TURTLEBOT3_MODEL=burger" >> ~/.bashrc
 
 # The working directory inside our container
-WORKDIR "/home/lab_robotica"
+WORKDIR "/home/lab_rob_shared"
