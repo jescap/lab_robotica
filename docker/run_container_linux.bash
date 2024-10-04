@@ -7,7 +7,7 @@ docker run -it \
     --name lab_rob_container \
     --net=host \
     --privileged \
-    --mount type=bind,source=/home/jescap/lab_robotica/exchange_dir,target=/home/lab_robotica/exchange_dir \
+    --mount type=bind,source=/home/username/lab_rob_shared,target=/home/lab_rob_shared \
     lab_rob_image \
     bash
     
