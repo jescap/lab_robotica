@@ -100,7 +100,7 @@ class Evaluation:
             rospy.loginfo("Stopped Evaluation node. Generating metrics result file")
             try:
                 with open(self.out_file,'w') as f:
-                    f.write('Goals reached: %d\n'%(self.goal_reached))
+                    f.write('Goals reached: %s\n'%(self.goal_reached))
                     f.write('Elapsed time: %f\n'%(float(self.elapsed_time)))
                     f.write('Traveled Distance: %f\n'%(self.distance_traveled))
                     f.write('Min distance to obstacles: %f\n'%(self.min_dist_to_obs))
@@ -150,7 +150,6 @@ class Evaluation:
             m = Marker()
             m.header.frame_id = p.header.frame_id
             m.header.stamp = t
-            m.text = str(i)
             m.ns = "goals"
             m.id = i
             m.type = Marker.CYLINDER
@@ -181,7 +180,6 @@ class Evaluation:
 
         m.header.frame_id = goal.header.frame_id
         m.header.stamp = t
-        #m.text = str(i)
         m.ns = "goal_flags"
         m.id = i
         m.type = Marker.CYLINDER
