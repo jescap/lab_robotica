@@ -21,8 +21,6 @@
        
 	<!-- Launch the reactive robot controller from autonomous_navigation package -->
     <!-- TO BE COMPLETED -->
-	<node pkg="autonomous_navigation" type="robot_controller_sol.py" name="robot_controller" output="screen" >
-	</node>
 
 </launch>
 
