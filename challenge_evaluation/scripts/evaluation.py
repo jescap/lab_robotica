@@ -102,12 +102,12 @@ class Evaluation:
                 with open(self.out_file,'w') as f:
                     f.write('Goals reached: %s\n'%(self.goal_reached))
                     f.write('Elapsed time: %f\n'%(float(self.elapsed_time)))
-                    f.write('Traveled Distance: %f\n'%(self.distance_traveled))
+                    f.write('Traveled distance: %f\n'%(self.distance_traveled))
                     f.write('Min distance to obstacles: %f\n'%(self.min_dist_to_obs))
                     f.write('Avg distance to obstacles: %f\n'%(self.avg_dist_to_obs))
                     f.write('Collision penalties: %d\n'%(self.collision_penalty))
-                    f.write('Linear vel penalties: %d\n'%(self.lin_vel_penalty))
-                    f.write('Angular vel penalties: %d\n'%(self.ang_vel_penalty))
+                    #f.write('Linear vel penalties: %d\n'%(self.lin_vel_penalty))
+                    #f.write('Angular vel penalties: %d\n'%(self.ang_vel_penalty))
                 rospy.loginfo('File exported successfully. Filename: %s', self.out_file)
             except OSError as e:
                 rospy.logerr('Could not save output file. Error: %s', str(e))

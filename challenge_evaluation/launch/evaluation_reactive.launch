@@ -6,8 +6,6 @@
         <param name="output_file" value="$(find challenge_evaluation)/config/metrics_reactive.txt" />
         <param name="base_frame" value="base_footprint" />
         <param name="global_frame" value="odom" />
-        <param name="max_lin_vel" value="0.25" />
-        <param name="max_ang_vel" value="1.2" />
         <param name="goal_tolerance" value="0.15" />
         <param name="min_collision_dist" value="0.12" />
     </node>
