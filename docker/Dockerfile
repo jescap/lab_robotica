@@ -18,7 +18,7 @@ RUN sudo apt install -y ros-noetic-dynamixel-sdk \
     ros-noetic-turtlebot3-*
 
 # We also install Git and file editors, just in case
-RUN sudo apt install -y git vim nano
+RUN sudo apt install -y git vim nano iputils-ping net-tools
 
 # MESA drivers for hardware acceleration graphics (Gazebo and RViz)
 RUN sudo apt -y install libgl1-mesa-glx libgl1-mesa-dri && \
