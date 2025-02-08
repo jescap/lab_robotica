@@ -127,10 +127,10 @@ class Evaluation:
     def cmd_vel_callback(self, data):
         #rospy.loginfo("cmd_vel received")
         if abs(data.linear.x) > self.max_lin_vel:
-            rospy.logwarn('Linear vel penalty!!!')
+            #rospy.logwarn('Linear vel penalty!!!')
             self.metrics.lin_vel_penalty += 1
         if abs(data.angular.z) > self.max_ang_vel:
-            rospy.logwarn('Angular vel penalty!!!')
+            #rospy.logwarn('Angular vel penalty!!!')
             self.metrics.ang_vel_penalty += 1
 
     def getTransform(self):
