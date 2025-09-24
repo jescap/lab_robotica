@@ -5,7 +5,7 @@ In this repository, students will find the required files to complete the course
 The repository also contains a set of notebooks to guide you through each of the practical sessions:
 
 - [Practical Session 1: Tools for robotics](https://colab.research.google.com/github/jescap/lab_robotica/blob/cuadernos/notebooks/LR_Practica_01.ipynb)
-- [Practical Session 2: Introduction to Python](https://colab.research.google.com/github/USUARIO/lab_robotica_GX/blob/main/notebooks/LR_Practica_02.ipynb)
+- [Practical Session 2: Introduction to Python](https://colab.research.google.com/github/jescap/lab_robotica/blob/cuadernos/notebooks/LR_Practica_02.ipynb)
 - [Practical Session 2: Introduction to Python. Exercises](https://colab.research.google.com/github/USUARIO/lab_robotica_GX/blob/main/notebooks/LR_Practica_02_ejercicios.ipynb)
 - [Practical Session 3: Running ROS in a Docker container](https://colab.research.google.com/github/USUARIO/lab_robotica_GX/blob/main/notebooks/LR_Practica_03.ipynb)
 - [Practical Session 4: ROS introduction](https://colab.research.google.com/github/USUARIO/lab_robotica_GX/blob/main/notebooks/LR_Practica_04.ipynb)
