@@ -24,9 +24,19 @@ RUN sudo apt install -y git vim nano iputils-ping net-tools
 RUN sudo apt -y install libgl1-mesa-glx libgl1-mesa-dri && \
     rm -rf /var/lib/apt/lists/*
 
-# We source the ROS instalation 
-RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
-RUN echo "export TURTLEBOT3_MODEL=burger" >> ~/.bashrc
+# Create a user provided as build argument
+ARG USER_NAME=student
+ARG USER_ID=1000
+ARG GROUP_ID=${USER_ID}
 
-# The working directory inside our container
-WORKDIR "/home/lab_rob_shared"
+RUN groupadd -g ${GROUP_ID} ${USER_NAME} && \
+    useradd -m -u ${USER_ID} -g ${GROUP_ID} -s /bin/bash ${USER_NAME} && \
+    echo "${USER_NAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Source the ROS installation
+RUN echo "source /opt/ros/noetic/setup.bash" >> /home/${USER_NAME}/.bashrc && \
+    echo "export TURTLEBOT3_MODEL=burger" >> /home/${USER_NAME}/.bashrc
+
+# Working directory inside our container
+USER ${USER_NAME}
+WORKDIR /home/${USER_NAME}/lab_rob_shared
