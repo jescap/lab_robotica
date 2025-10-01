@@ -12,6 +12,7 @@ import tf
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import PoseStamped
 from sensor_msgs.msg import LaserScan
+from nav_msgs.msg import Path
 from visualization_msgs.msg import Marker, MarkerArray
 
 class Evaluation:
@@ -28,7 +29,8 @@ class Evaluation:
         self.max_ang_vel = rospy.get_param('~max_ang_vel', default=1.2)
         self.goal_gap = rospy.get_param('~goal_tolerance', default=0.15) 
         self.min_collision = rospy.get_param('~min_collision_dist', default=0.1)
-        
+        self.path_following = rospy.get_param('~path_following', default=False)
+
         # Get the robot pose in global frame
         self.has_transform = False
         while not(self.has_transform):
@@ -40,34 +42,66 @@ class Evaluation:
         self.metrics = self.Metrics(self.output_file)
         self.hist_dist_to_obs = []
 
-        # Read the goals from the param server
-        goals = sorted(rospy.get_param('/goals').items())
-        self.goals_queue = []
-        t = rospy.Time.now()
-        for i in goals:
-            rospy.loginfo("Reading goal x: %.2f, y: %.2f", i[1]['x'], i[1]['y'])
-            pose = PoseStamped()
-            pose.header.frame_id = self.global_frame
-            pose.header.stamp = t
-            #pose.header.seq = 0
-            pose.pose.position.x = float(i[1]['x'])
-            pose.pose.position.y = float(i[1]['y'])
-            pose.pose.position.z = 0
-            pose.pose.orientation.w = 1.0
-            self.goals_queue.append(pose)
+        if self.path_following:
 
-        # Generate visualization markers for goals
-        markers = self.generate_visualization_goals()
-        self.flag_markers = MarkerArray()
-        
-        # Take the first goal
-        self.current_goal = self.goals_queue.pop(0)
+            # Read path from the Param Server
+            goals = sorted(rospy.get_param('path').items())
+            self.goals_queue = []
+            # Fill the path message
+            self.path = Path()
+            self.path.header.frame_id = self.global_frame
+            seq_goals = 0
+            for i in goals:
+                rospy.loginfo("Reading path waypoint x: %.2f, y: %.2f", i[1]['x'], i[1]['y'])
+                pose = PoseStamped()
+                pose.header.frame_id = self.path.header.frame_id
+                pose.header.seq = seq_goals
+                seq_goals += 1
+                pose.pose.position.x = i[1]['x']
+                pose.pose.position.y = i[1]['y']
+                pose.pose.position.z = 0.0
+                pose.pose.orientation.w = 1.0
+                self.path.poses.append(pose)
+
+            # Take the last goal
+            self.current_goal = self.path.poses[-1]
+            self.goals_queue.append(self.current_goal)
+            self.time_limit = 90.0 # 120 seconds = 2 min
+
+            # Generate visualization markers for goals
+            markers = self.generate_visualization_goals()
+
+        else:        
+            # Read the goals from the param server
+            goals = sorted(rospy.get_param('goals').items())
+            self.goals_queue = []
+            t = rospy.Time.now()
+            for i in goals:
+                rospy.loginfo("Reading goal x: %.2f, y: %.2f", i[1]['x'], i[1]['y'])
+                pose = PoseStamped()
+                pose.header.frame_id = self.global_frame
+                pose.header.stamp = t
+                #pose.header.seq = 0
+                pose.pose.position.x = float(i[1]['x'])
+                pose.pose.position.y = float(i[1]['y'])
+                pose.pose.position.z = 0
+                pose.pose.orientation.w = 1.0
+                self.goals_queue.append(pose)
+
+            # Generate visualization markers for goals
+            markers = self.generate_visualization_goals()
+
+            # Take the first goal
+            self.current_goal = self.goals_queue.pop(0)
+            self.time_limit = 200.0 # 200 seconds = 3 min 20 seg
+            
+        self.flag_markers = MarkerArray()       
         self.goal_sent = False
-        self.time_limit = 200.0 # 200 seconds = 3 min 20 seg
         self.count = 0
 
         rospy.loginfo("Before publishers and subscribers....")
         self.goal_pub = rospy.Publisher("move_base_simple/goal", PoseStamped, queue_size=10)
+        self.path_pub = rospy.Publisher("path", Path, queue_size=10)
         self.marker_pub = rospy.Publisher("goal_markers", MarkerArray, queue_size=10)
         self.flag_pub = rospy.Publisher("flag_markers", MarkerArray, queue_size=10)
         rospy.Subscriber("scan", LaserScan, self.scan_callback, queue_size=1)
@@ -108,6 +142,7 @@ class Evaluation:
                     f.write('Collision penalties: %d\n'%(self.collision_penalty))
                     #f.write('Linear vel penalties: %d\n'%(self.lin_vel_penalty))
                     #f.write('Angular vel penalties: %d\n'%(self.ang_vel_penalty))
+                    
                 rospy.loginfo('File exported successfully. Filename: %s', self.out_file)
             except OSError as e:
                 rospy.logerr('Could not save output file. Error: %s', str(e))
@@ -207,12 +242,18 @@ class Evaluation:
         gy = self.current_goal.pose.position.y
 
         # If no goal has been sent, send it!
-        if self.goal_sent == False and self.goal_pub.get_num_connections() > 0:
+        if self.goal_sent == False:
             
-            #self.current_goal.header.stamp = rospy.Time.now()
-            self.goal_pub.publish(self.current_goal)
-            rospy.loginfo("\n\t\tNAVIGATION GOAL x:%.2f, y:%.2f SENT!\n", gx, gy)
-            self.goal_sent = True
+            if self.path_following and self.path_pub.get_num_connections() > 1:
+                #self.path.header.stamp = rospy.Time.now()
+                self.path_pub.publish(self.path)
+                rospy.loginfo("\n\t\tNAVIGATION PATH TO GOAL x:%.2f, y:%.2f SENT!\n", gx, gy)
+                self.goal_sent = True
+            elif self.goal_pub.get_num_connections() > 0:
+                #self.current_goal.header.stamp = rospy.Time.now()
+                self.goal_pub.publish(self.current_goal)
+                rospy.loginfo("\n\t\tNAVIGATION GOAL x:%.2f, y:%.2f SENT!\n", gx, gy)    
+                self.goal_sent = True
     
         # Get the current robot position in the map
         cx,cy = self.getTransform()
@@ -244,8 +285,8 @@ class Evaluation:
         if dist_goal <= self.goal_gap:
             rospy.loginfo("Goal x: %.2f, y: %.2f reached!!! Elapsed time: %.2f\n", gx, gy, ts)
             self.publish_flag(self.current_goal)
-            # Update goal if possible
-            if len(self.goals_queue) > 0:
+            # Update goal if possible. In path following mode there is only one final goal
+            if not self.path_following and len(self.goals_queue) > 0:
                 self.current_goal = self.goals_queue.pop(0)
                 self.current_goal.header.seq += 1
                 self.goal_sent = False

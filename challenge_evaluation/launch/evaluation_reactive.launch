@@ -1,8 +1,13 @@
 <launch>
 	<arg name="goals_file" default="navigation_goals"/>
-	<rosparam command="delete" param="/goals" />
+    <arg name="path_file" default="navigation_path"/>
+	<rosparam command="delete" param="goals" />
 	<rosparam command="load" file="$(find challenge_evaluation)/config/$(arg goals_file).yaml" />
+    <rosparam command="delete" param="path" />
+	<rosparam command="load" file="$(find challenge_evaluation)/config/$(arg path_file).yaml" />
+
 	<node pkg="challenge_evaluation" type="evaluation.py" name="evaluation" output="screen">
+        <param name="path_following" value="false" />
         <param name="output_file" value="$(find challenge_evaluation)/config/metrics_reactive.txt" />
         <param name="base_frame" value="base_footprint" />
         <param name="global_frame" value="odom" />
