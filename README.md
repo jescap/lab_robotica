@@ -10,5 +10,6 @@ The repository also contains a set of notebooks to guide you through each of the
 - [Practical Session 3: Running ROS in a Docker container](https://colab.research.google.com/github/jescap/lab_robotica/blob/main/notebooks/LR_Practica_03.ipynb)
 - [Practical Session 4: ROS introduction](https://colab.research.google.com/github/jescap/lab_robotica/blob/main/notebooks/LR_Practica_04.ipynb)
 - [Practical Session 5: Robotics challenge. Reactive navigation](https://colab.research.google.com/github/jescap/lab_robotica/blob/main/notebooks/LR_Practica_05.ipynb)
+- [Practical Session 6: Hardware deployment with the Turtlebot3 Burger](https://colab.research.google.com/github/jescap/lab_robotica/blob/main/notebooks/LR_Practica_06.ipynb)
 
  
