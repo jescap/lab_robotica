@@ -1,4 +1,5 @@
 docker run -it \
+    --rm \
     --env="DISPLAY=host.docker.internal:0" \
     --name lab_rob_container \
     --net=host \
@@ -6,5 +7,3 @@ docker run -it \
     --mount type=bind,source=/home/[USER]/lab_rob_shared,target=/home/[USER]/lab_rob_shared \
     lab_rob_image \
     bash
-    
-docker rm lab_rob_container
