@@ -1,3 +1,4 @@
+xhost +localhost
 docker run -it \
     --rm \
     --env="DISPLAY=host.docker.internal:0" \
