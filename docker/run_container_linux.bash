@@ -10,5 +10,5 @@ docker run -it \
     --net=host \
     --privileged \
     --mount type=bind,source=/home/jescap/lab_rob_shared,target=/home/jescap/lab_rob_shared \
-    lab_rob_image_ros2 \
+    lab_rob_image_ros \
     bash
