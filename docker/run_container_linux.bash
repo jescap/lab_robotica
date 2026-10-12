@@ -9,6 +9,6 @@ docker run -it \
     --name lab_rob_container \
     --net=host \
     --privileged \
-    --mount type=bind,source=/home/jescap/lab_rob_shared,target=/home/jescap/lab_rob_shared \
+    --mount type=bind,source=/home/[USER]/lab_rob_shared,target=/home/[USER]/lab_rob_shared \
     lab_rob_image \
     bash
