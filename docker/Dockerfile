@@ -12,8 +12,9 @@ RUN sudo apt update && sudo apt install -y ros-jazzy-joy ros-jazzy-teleop-twist-
     ros-jazzy-navigation2 ros-jazzy-nav2-bringup \
     ros-jazzy-interactive-markers ros-jazzy-vision-msgs ros-jazzy-xacro
 
-# We also install Git, file editors, and the colcon/rosdep build tools, just in case
-RUN sudo apt install -y git vim nano iputils-ping net-tools \
+# We also install Git, wget (needed by some official ROS 2 tutorials to download
+# example code), file editors, and the colcon/rosdep build tools, just in case
+RUN sudo apt install -y git wget vim nano iputils-ping net-tools \
     python3-colcon-common-extensions python3-rosdep
 
 # MESA drivers for hardware acceleration graphics (Gazebo and RViz2). Package names
