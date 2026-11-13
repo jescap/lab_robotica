@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Launch the Gazebo simulation. Initial Turtlebot position is given as argument. -->
+  <include file="$(find-pkg-share turtlebot3_gazebo)/launch/turtlebot3_world.launch.py">
+    <let name="x_pose" value="-2.5"/>
+    <let name="y_pose" value="0.0"/>
+  </include>
+
+  <!-- Launch the path publisher -->
+  <include file="$(find-pkg-share autonomous_navigation)/launch/path_publisher.launch.xml">
+    <let name="path_file" value="$(find-pkg-share autonomous_navigation)/config/path.yaml"/>
+  </include>
+
+  <!-- Launch RViz -->
+  <node pkg="rviz2" exec="rviz2" name="rviz2"
+        args="-d $(find-pkg-share autonomous_navigation)/config/challenge_reactive.rviz"/>
+
+</launch>

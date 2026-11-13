@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Path YAML file to load -->
+  <arg name="path_file" default="$(find-pkg-share autonomous_navigation)/config/path.yaml"/>
+
+  <node pkg="autonomous_navigation" exec="path_publisher" name="path_publisher" output="screen">
+    <param name="path_file" value="$(var path_file)"/>
+    <param name="path_frame" value="odom"/>
+  </node>
+</launch>
