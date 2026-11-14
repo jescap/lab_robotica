@@ -1,43 +1,69 @@
-#!/usr/bin/python3
-# This Python file uses the following encoding: utf-8
+import yaml
 
-import sys
-import math
-import rospy
+import rclpy
+from rclpy.node import Node
+
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Path
 
 
-if __name__ == '__main__':
+class PathPublisher(Node):
+
+    def __init__(self):
+        super().__init__('path_publisher')
+
+        # The node receives the path of a YAML file with the goals.
+        # It also receives the frame of the goals. 
+        self.declare_parameter('path_file', '')
+        self.declare_parameter('path_frame', 'odom')
+
+        path_file = self.get_parameter('path_file').get_parameter_value().string_value
+
+        if not path_file:
+            raise RuntimeError(
+                "The 'path_file' parameter is required (path to a YAML file with the path points)")
+
+        path_frame = self.get_parameter('path_frame').get_parameter_value().string_value
+
+        with open(path_file, 'r') as f:
+            goals = sorted(yaml.safe_load(f)['path'].items())
+
+        # Fill the path message
+        self.path = Path()
+        self.path.header.frame_id = path_frame
+        
+        for point in goals:
+            pose = PoseStamped()
+            pose.header.frame_id = self.path.header.frame_id
+            pose.pose.position.x = point[1]['x']
+            pose.pose.position.y = point[1]['y']
+            pose.pose.position.z = 0.0
+            self.path.poses.append(pose)
+            self.get_logger().info(f"Added point {point[1]['x']:.2f}, {point[1]['y']:.2f}")
+
+        self.path_publisher = self.create_publisher(Path, 'path', 10)
+
+        # Send the path once a second
+        self.timer = self.create_timer(1.0, self.publish_path)
+
+    def publish_path(self):
+        self.path.header.stamp = self.get_clock().now().to_msg()
+        self.path_publisher.publish(self.path)
+
+
+def main(args=None):
     
-    # Create the path publisher
-    path_publisher = rospy.Publisher('path', Path, queue_size=10)
-    rospy.init_node('path_publisher', anonymous=False)  
-    seq = 0
+    rclpy.init(args=args)
+    node = PathPublisher()
 
-    # Read path from the Param Server
-    goals = sorted(rospy.get_param('path').items())
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
 
-    # Fill the path message
-    path = Path()
-    path.header.frame_id = rospy.get_param("~path_frame", default="odom")
-    seq_goals = 0
-    for i in goals:
-        pose = PoseStamped()
-        pose.header.frame_id = path.header.frame_id
-        pose.header.seq = seq_goals
-        seq_goals += 1
-        pose.pose.position.x = i[1]['x']
-        pose.pose.position.y = i[1]['y']
-        pose.pose.position.z = 0
-        path.poses.append(pose)
-        rospy.loginfo("Added point %f, %f", pose.pose.position.x, pose.pose.position.y)
+    node.destroy_node()
+    rclpy.shutdown()
 
-    # Send the path each second
-    r = rospy.Rate(1) # 1Hz
-    while not rospy.is_shutdown():
-        path.header.stamp = rospy.Time.now()
-        path.header.seq = seq
-        path_publisher.publish(path)
-        seq = seq + 1
-        r.sleep()
+
+if __name__ == '__main__':
+    main()

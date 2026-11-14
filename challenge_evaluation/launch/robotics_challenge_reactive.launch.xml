@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="x_pose" default="-1.6"/>
+  <arg name="y_pose" default="2.0"/>
+
+  <!-- Launch the Gazebo simulation. --> 
+  <!-- Initial position of the Turblebot is given as parameters. -->
+  <include file="$(find-pkg-share turtlebot3_gazebo)/launch/turtlebot3_dqn_stage4.launch.py">
+    <let name="x_pose" value="$(var x_pose)"/>
+    <let name="y_pose" value="$(var y_pose)"/>
+  </include>
+
+  <!-- Launch RViz2 -->
+  <node pkg="rviz2" exec="rviz2" name="rviz2"
+        args="-d $(find-pkg-share challenge_evaluation)/config/robotics_challenge_reactive.rviz"/>
+
+  <!-- Launch the reactive robot controller from your autonomous_navigation package -->
+  <!-- TO BE COMPLETED -->
+
+</launch>

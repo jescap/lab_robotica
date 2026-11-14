@@ -1,30 +1,33 @@
+## ROS2/Nav2 note: this file configures a standalone "costmap" node, not the full Nav2 planner/controller
+## stack: that node is lifecycle-managed just like map_server/amcl, so it also
+## needs a lifecycle_manager to reach the active state.
+##
 costmap:
-   global_frame: map
-   robot_base_frame: base_footprint
-   map_topic: map
+  ros__parameters:
+    global_frame: map
+    robot_base_frame: base_footprint
+    map_topic: map
 
-   always_send_full_costmap: true
-   static_map: true
-   
-   rolling_window: false
-   
-   update_frequency: 5
-   publish_frequency: 5
-   
-   transform_tolerance: 1
-   resolution: 0.05
-   robot_radius: 0.1 
-      
-   inflation_layer: 
-      cost_scaling_factor: 1
-      enabled: true
-      inflate_unknown: false
-      inflation_radius: 1.0
-      
-   static_layer:
+    always_send_full_costmap: true
+    rolling_window: false
+
+    update_frequency: 5.0
+    publish_frequency: 5.0
+
+    transform_tolerance: 1.0
+    resolution: 0.05
+    robot_radius: 0.1
+
+    plugins: ["static_layer", "inflation_layer"]
+
+    static_layer:
+      plugin: "nav2_costmap_2d::StaticLayer"
       unknown_cost_value: -1
       lethal_cost_threshold: 100
 
-   plugins:
-      - {name: static_layer, type: "costmap_2d::StaticLayer"}
-      - {name: inflation_layer, type: 'costmap_2d::InflationLayer'}
+    inflation_layer:
+      plugin: "nav2_costmap_2d::InflationLayer"
+      enabled: true
+      inflate_unknown: false
+      cost_scaling_factor: 1.0
+      inflation_radius: 1.0

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- navigation_goals.yaml/navigation_path.yaml hold odom-relative coordinates,
+       matching this "reactive" evaluation (global_frame=odom):
+       /odom starts at (0,0) at the robot's spawn point instead of at the absolute
+       Gazebo-world pose the original coordinates were authored in. -->
+  <arg name="goals_file" default="$(find-pkg-share challenge_evaluation)/config/navigation_goals.yaml"/>
+  <arg name="path_file" default="$(find-pkg-share challenge_evaluation)/config/navigation_path.yaml"/>
+
+  <node pkg="challenge_evaluation" exec="evaluation" name="evaluation" output="screen">
+    <param name="path_following" value="false"/>
+    <param name="goals_file" value="$(var goals_file)"/>
+    <param name="path_file" value="$(var path_file)"/>
+    <!-- Metrics are saved in the directory the launch was run from -->
+    <param name="output_file" value="metrics_reactive.txt"/>
+    <param name="base_frame" value="base_footprint"/>
+    <param name="global_frame" value="odom"/>
+    <param name="goal_tolerance" value="0.15"/>
+    <param name="min_collision_dist" value="0.12"/>
+  </node>
+</launch>
