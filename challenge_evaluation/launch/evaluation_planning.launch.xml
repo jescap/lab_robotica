@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- navigation_goals_planning.yaml holds absolute Gazebo-world coordinates,
+       matching this planning evaluation (global_frame=map via AMCL). -->
+  <arg name="goals_file" default="$(find-pkg-share challenge_evaluation)/config/navigation_goals_planning.yaml"/>
+
+  <node pkg="challenge_evaluation" exec="evaluation" name="evaluation" output="screen">
+    <param name="path_following" value="false"/>
+    <param name="goals_file" value="$(var goals_file)"/>
+    <!-- Metrics are saved in the directory the launch was run from -->
+    <param name="output_file" value="metrics_planning.txt"/>
+    <param name="base_frame" value="base_footprint"/>
+    <param name="global_frame" value="map"/>
+    <param name="goal_tolerance" value="0.15"/>
+    <param name="min_collision_dist" value="0.12"/>
+  </node>
+</launch>

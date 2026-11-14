@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Robot initial position -->
+  <arg name="x_pose" default="-1.6"/>
+  <arg name="y_pose" default="2.0"/>
+  <arg name="z_pose" default="0.0"/>
+  <arg name="h_pose" default="0.0"/>
+
+  <!-- Launch the Gazebo simulation. -->
+  <!-- Initial position of the Turtlebot is given as parameters. -->
+  <include file="$(find-pkg-share turtlebot3_gazebo)/launch/turtlebot3_dqn_stage4.launch.py">
+    <let name="x_pose" value="$(var x_pose)"/>
+    <let name="y_pose" value="$(var y_pose)"/>
+  </include>
+
+  <!-- Launch RViz2 -->
+  <node pkg="rviz2" exec="rviz2" name="rviz2"
+        args="-d $(find-pkg-share challenge_evaluation)/config/robotics_challenge_planning.rviz"/>
+
+  <!-- Global costmap for path planning: a standalone nav2_costmap_2d node (not the
+       full Nav2 planner/controller stack), so that a future, student-written
+       planner node has a costmap to consume. Like map_server/amcl, this is a
+       lifecycle node, so it needs its own lifecycle_manager to become active. -->
+  <node pkg="nav2_costmap_2d" exec="nav2_costmap_2d" name="costmap" output="screen">
+    <param from="$(find-pkg-share autonomous_navigation)/config/global_costmap_params.yaml"/>
+  </node>
+  <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_costmap" output="screen">
+    <param name="autostart" value="true"/>
+    <param name="node_names" value="[costmap]"/>
+  </node>
+
+  <!-- Launch localization (map_server + AMCL) -->
+  <include file="$(find-pkg-share autonomous_navigation)/launch/localization.launch.xml">
+    <let name="x_pose" value="$(var x_pose)"/>
+    <let name="y_pose" value="$(var y_pose)"/>
+    <let name="h_pose" value="$(var h_pose)"/>
+    <let name="map_file" value="$(find-pkg-share autonomous_navigation)/config/map.yaml"/>
+  </include>
+
+  <!-- Launch the reactive robot controller and the path planner from autonomous_navigation package -->
+  <!-- TO BE COMPLETED -->
+
+</launch>
