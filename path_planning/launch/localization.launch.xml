@@ -11,14 +11,21 @@
   <arg name="z_pose" default="0.0"/>
   <arg name="h_pose" default="0.0"/>
 
+  <!-- true in simulation (Gazebo publishes /clock, and the robot's TF/scan carry
+       sim-time timestamps that amcl/map_server/costmap must match); 
+       override with use_sim_time:=false when reused on the real robot,   -->
+  <arg name="use_sim_time" default="true"/>
+
   <!-- Map server: in ROS2 this is a lifecycle node, like every Nav2 node
        (see the lifecycle_manager below, which brings it to the active state) -->
   <node pkg="nav2_map_server" exec="map_server" name="map_server" output="screen">
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
     <param name="yaml_filename" value="$(var map_file)"/>
   </node>
 
   <!-- AMCL. -->
   <node pkg="nav2_amcl" exec="amcl" name="amcl" output="screen">
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
     <param name="set_initial_pose" value="true"/>
     <param name="initial_pose.x" value="$(var x_pose)"/>
     <param name="initial_pose.y" value="$(var y_pose)"/>
@@ -62,6 +69,7 @@
        configure -> activate. This lifecycle manager does that automatically on
        startup (autostart), exactly like nav2_bringup's own localization_launch.py. -->
   <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_localization" output="screen">
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
     <param name="autostart" value="true"/>
     <param name="node_names" value="[map_server, amcl]"/>
   </node>
