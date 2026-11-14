@@ -36,6 +36,7 @@ class TurtlebotController(Node):
         # Commanding the robot at a fixed rate (10Hz),
         self.timer = self.create_timer(0.1, self.command)
 
+
     def stop_robot(self):
         # Stop turtlebot
         self.get_logger().info('Stop robot')
@@ -48,7 +49,7 @@ class TurtlebotController(Node):
         self.goal_received = True
 
     def command(self):
-
+        
         # Check if we already received data
         if not self.goal_received:
             self.get_logger().info('Goal not received. Waiting...')
