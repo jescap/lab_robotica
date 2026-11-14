@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Map file to load -->
+  <arg name="map_file" default="$(find-pkg-share autonomous_navigation)/config/map.yaml"/>
+  <arg name="scan_topic" default="scan"/>
+
+  <!-- Robot initial position (used to seed AMCL, see below) -->
+  <arg name="x_pose" default="0.0"/>
+  <arg name="y_pose" default="0.0"/>
+  <arg name="z_pose" default="0.0"/>
+  <arg name="h_pose" default="0.0"/>
+
+  <!-- Map server: in ROS2 this is a lifecycle node, like every Nav2 node
+       (see the lifecycle_manager below, which brings it to the active state) -->
+  <node pkg="nav2_map_server" exec="map_server" name="map_server" output="screen">
+    <param name="yaml_filename" value="$(var map_file)"/>
+  </node>
+
+  <!-- AMCL. -->
+  <node pkg="nav2_amcl" exec="amcl" name="amcl" output="screen">
+    <param name="set_initial_pose" value="true"/>
+    <param name="initial_pose.x" value="$(var x_pose)"/>
+    <param name="initial_pose.y" value="$(var y_pose)"/>
+    <param name="initial_pose.z" value="$(var z_pose)"/>
+    <param name="initial_pose.yaw" value="$(var h_pose)"/>
+    <param name="robot_model_type" value="nav2_amcl::DifferentialMotionModel"/>
+    <param name="alpha1" value="0.2"/>
+    <param name="alpha2" value="0.2"/>
+    <param name="alpha3" value="0.2"/>
+    <param name="alpha4" value="0.2"/>
+    <param name="alpha5" value="0.1"/>
+    <param name="max_beams" value="60"/>
+    <param name="laser_max_range" value="12.0"/>
+    <param name="min_particles" value="500"/>
+    <param name="max_particles" value="2000"/>
+    <param name="pf_err" value="0.05"/>
+    <param name="pf_z" value="0.99"/>
+    <param name="z_hit" value="0.5"/>
+    <param name="z_short" value="0.05"/>
+    <param name="z_max" value="0.05"/>
+    <param name="z_rand" value="0.5"/>
+    <param name="sigma_hit" value="0.2"/>
+    <param name="lambda_short" value="0.1"/>
+    <param name="laser_model_type" value="likelihood_field"/>
+    <param name="laser_likelihood_max_dist" value="2.0"/>
+    <param name="update_min_d" value="0.25"/>
+    <param name="update_min_a" value="0.2"/>
+    <param name="odom_frame_id" value="odom"/>
+    <param name="base_frame_id" value="base_footprint"/>
+    <param name="global_frame_id" value="map"/>
+    <param name="resample_interval" value="1"/>
+    <!-- Increased tolerance because the computer can get quite busy -->
+    <param name="transform_tolerance" value="1.0"/>
+    <param name="recovery_alpha_slow" value="0.0"/>
+    <param name="recovery_alpha_fast" value="0.0"/>
+    <param name="scan_topic" value="$(var scan_topic)"/>
+  </node>
+
+  <!-- map_server and amcl are lifecycle (managed) nodes in ROS2: they start in the
+       "unconfigured" state and stay inactive until something drives them through
+       configure -> activate. This lifecycle manager does that automatically on
+       startup (autostart), exactly like nav2_bringup's own localization_launch.py. -->
+  <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_localization" output="screen">
+    <param name="autostart" value="true"/>
+    <param name="node_names" value="[map_server, amcl]"/>
+  </node>
+
+</launch>
